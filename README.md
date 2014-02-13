@@ -1,2 +1,2 @@
-An extension to wikipedia and youtube - discussWiki
+DiscussWiki - an attempt to make the wiki experience better
 
