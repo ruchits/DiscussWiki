@@ -1,10 +1,19 @@
 package com.archetype.discusswikipedia;
 
+
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 /**
  * An activity representing a single Article detail screen. This activity is
@@ -15,7 +24,19 @@ import android.view.MenuItem;
  * a {@link ArticleDetailFragment}.
  */
 public class ArticleDetailActivity extends FragmentActivity {
-
+	
+	/**
+	 * ID of the dummy content this activity is presenting.
+	 */
+	private String mItemId;
+	
+	private String[] mDummyTitles;
+	private ListView mTopDrawerView;
+	private ListView mBottomDrawerView;
+    private DrawerLayout mDrawerLayout;
+    
+    private ActionBarDrawerToggle mDrawerToggle;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -42,14 +63,71 @@ public class ArticleDetailActivity extends FragmentActivity {
 			ArticleDetailFragment fragment = new ArticleDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.article_detail_container, fragment).commit();
+					.add(R.id.article_drawer_container, fragment).commit();
 		}
-	}
+		
+		// Init drawer views
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.article_drawer_container);
+        mTopDrawerView = (ListView) findViewById(R.id.top_drawer);
+        mBottomDrawerView = (ListView) findViewById(R.id.bottom_drawer);
+        
+		// Update the drawer list with dummy items
+		mDummyTitles = getResources().getStringArray(R.array.planets_array);
+		
+        // TODO: Remove the dummy data
+        // Set the adapter for the list view
+        mTopDrawerView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDummyTitles));
+        mBottomDrawerView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDummyTitles));
+        
+        // Set the list's click listener
+        mTopDrawerView.setOnItemClickListener(new DrawerItemClickListener());
+        mBottomDrawerView.setOnItemClickListener(new DrawerItemClickListener());
 
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+                ) {
+        	
+            public void onDrawerClosed(View drawerView) {
+                if(drawerView.equals(mTopDrawerView)) {
+                    getActionBar().setTitle(getTitle());
+                    supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                    mDrawerToggle.syncState();
+                }
+            }
+            
+            public void onDrawerOpened(View drawerView) {
+                if(drawerView.equals(mTopDrawerView)) {
+                    getActionBar().setTitle(getString(R.string.app_name));
+                    supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                    mDrawerToggle.syncState();
+                }                   
+            }
+            
+        };
+        
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        
+	}
+    
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
+			mDrawerToggle.onOptionsItemSelected(item);
+
+            if(mDrawerLayout.isDrawerOpen(mBottomDrawerView))
+                mDrawerLayout.closeDrawer(mBottomDrawerView);
+            
 			// This ID represents the Home or Up button. In the case of this
 			// activity, the Up button is shown. Use NavUtils to allow users
 			// to navigate up one level in the application structure. For
@@ -62,5 +140,49 @@ public class ArticleDetailActivity extends FragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+    /* The click listener for ListView in the navigation drawer */
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //selectItem(position);
+        }
+    }
+    
+    /**
+     * When using the ActionBarDrawerToggle, you must call it during
+     * onPostCreate() and onConfigurationChanged()...
+     */
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggles
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        for(int i = 0; i< menu.size(); i++)
+            menu.getItem(i).setVisible(!mDrawerLayout.isDrawerOpen(mTopDrawerView));
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+    
+	// This method will get called whenever the video button is pressed
+	// Launch the video activity with the appropriate item ID
+	public void handleClick() {
+		Intent detailIntent = new Intent(this, VideoDetailActivity.class);
+		detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, mItemId);
+		startActivity(detailIntent);
 	}
 }

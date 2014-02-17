@@ -17,9 +17,9 @@
             android:name="com.archetype.discusswikipedia.ArticleListActivity"
             android:label="@string/title_article_list" >
             <intent-filter>
-            	<action android:name="android.intent.action.MAIN" />
-            	<category android:name="android.intent.category.LAUNCHER" />
-       		</intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.archetype.discusswikipedia.ArticleDetailActivity"
