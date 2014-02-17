@@ -9,6 +9,8 @@ import android.widget.EditText;
 
 public class SearchActivity extends Activity {
 
+	public static final String ARTICLE_ID= "article_id";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -23,10 +25,11 @@ public class SearchActivity extends Activity {
 	}
 	
 	public void search(View view){
-		
-		Intent intent = new Intent(this, ArticleListActivity.class);
 		EditText editText = (EditText) findViewById(R.id.editText1);
 		String searchTerm = editText.getText().toString();
+		Intent intent = new Intent(this, ArticleListActivity.class);
+		intent.putExtra(ARTICLE_ID, searchTerm);
+		startActivity(intent);
     }
 
 }

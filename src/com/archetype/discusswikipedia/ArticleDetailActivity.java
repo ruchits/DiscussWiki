@@ -177,12 +177,4 @@ public class ArticleDetailActivity extends FragmentActivity {
 
         return super.onPrepareOptionsMenu(menu);
     }
-    
-	// This method will get called whenever the video button is pressed
-	// Launch the video activity with the appropriate item ID
-	public void handleClick() {
-		Intent detailIntent = new Intent(this, VideoDetailActivity.class);
-		detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, mItemId);
-		startActivity(detailIntent);
-	}
 }
